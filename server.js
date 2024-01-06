@@ -3,10 +3,12 @@ require("dotenv").config();
 const express = require('express');
 const app = express();
 
+const authRoutes = require("./src/routes/app/authRoutes");
 const PORT = process.env.PORT || 8080;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(authRoutes);
 
 app.get("/", (req, res) => {
   res.status(200).json({
