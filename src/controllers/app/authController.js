@@ -68,16 +68,24 @@ const signIn = async (req, res) => {
 const register = async (req, res) => {
   try {
     const userAccount = {
+      displayName: req.body.name,
+      phoneNumber: req.body.phoneNumber,
       email: req.body.email,
       password: req.body.password,
     };
     const userResponse = await admin.auth().createUser({
+      displayName: userAccount.displayName,
+      phoneNumber: userAccount.phoneNumber,
       email: userAccount.email,
       password: userAccount.password,
     });
 
+    console.log("userResponse", userResponse);
+
     const uid = userResponse.uid;
     const email = userResponse.email;
+    const name = userResponse.displayName;
+    const phoneNumber = userResponse.phoneNumber;
 
     res.status(200).json({
       code: 200,
@@ -86,6 +94,8 @@ const register = async (req, res) => {
       data: {
         uid: uid,
         email: email,
+        name: name,
+        phoneNumber: phoneNumber,
       },
     });
   } catch (error) {
