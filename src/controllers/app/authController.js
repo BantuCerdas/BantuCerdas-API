@@ -1,5 +1,7 @@
 require("dotenv").config();
 
+const User = require("../../models/user");
+
 const { getAuth, signInWithEmailAndPassword } = require("firebase/auth");
 const firebase = require("firebase/app");
 const admin = require("firebase-admin");
@@ -68,13 +70,13 @@ const signIn = async (req, res) => {
 const register = async (req, res) => {
   try {
     const userAccount = {
-      displayName: req.body.name,
+      name: req.body.name,
       phoneNumber: req.body.phoneNumber,
       email: req.body.email,
       password: req.body.password,
     };
     const userResponse = await admin.auth().createUser({
-      displayName: userAccount.displayName,
+      displayName: userAccount.name,
       phoneNumber: userAccount.phoneNumber,
       email: userAccount.email,
       password: userAccount.password,
@@ -98,6 +100,15 @@ const register = async (req, res) => {
         phoneNumber: phoneNumber,
       },
     });
+
+    await User.create({
+      id: uid,
+      name: name,
+      email: email,
+      phoneNumber: phoneNumber,
+    });
+    
+    console.log("User created");
   } catch (error) {
     res.status(400).json({
       code: 400,
