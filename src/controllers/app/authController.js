@@ -1,12 +1,21 @@
+require("dotenv").config();
+
+const User = require("../../models/user");
+
 const { getAuth, signInWithEmailAndPassword } = require("firebase/auth");
 const firebase = require("firebase/app");
+const admin = require("firebase-admin");
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBZrICGSgsmAmtPY-029xXKgfKaLm2eY-8",
+  apiKey: process.env.FIREBASE_API_KEY,
 };
+const serviceAccount = require("../../config/bantucerdas-firebase.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
 
 const app = firebase.initializeApp(firebaseConfig);
-
 const auth = getAuth(app);
 
 const signIn = async (req, res) => {
@@ -48,17 +57,68 @@ const signIn = async (req, res) => {
       });
     })
     .catch((error) => {
-        const errorMessage = error.message;
+      const errorMessage = error.message;
+
+      res.status(400).json({
+        code: 400,
+        error: true,
+        message: errorMessage,
+      });
+    });
+};
+
+const register = async (req, res) => {
+  try {
+    const userAccount = {
+      name: req.body.name,
+      phoneNumber: req.body.phoneNumber,
+      email: req.body.email,
+      password: req.body.password,
+    };
+    const userResponse = await admin.auth().createUser({
+      displayName: userAccount.name,
+      phoneNumber: userAccount.phoneNumber,
+      email: userAccount.email,
+      password: userAccount.password,
+    });
+
+    console.log("userResponse", userResponse);
+
+    const uid = userResponse.uid;
+    const email = userResponse.email;
+    const name = userResponse.displayName;
+    const phoneNumber = userResponse.phoneNumber;
+
+    res.status(200).json({
+      code: 200,
+      error: false,
+      message: "Register success, you can login now",
+      data: {
+        uid: uid,
+        email: email,
+        name: name,
+        phoneNumber: phoneNumber,
+      },
+    });
+
+    await User.create({
+      id: uid,
+      name: name,
+      email: email,
+      phoneNumber: phoneNumber,
+    });
     
-        res.status(400).json({
-            code: 400,
-            error: true,
-            message: errorMessage,
-        });
-        }
-    );
+    console.log("User created");
+  } catch (error) {
+    res.status(400).json({
+      code: 400,
+      error: true,
+      message: error.message,
+    });
+  }
 };
 
 module.exports = {
   signIn,
+  register,
 };
