@@ -18,10 +18,10 @@ Request Body:
 curl --location 'http://localhost:5000/api/v1/app/register' \
 --header 'Content-Type: application/json' \
 --data-raw '{
-    "name": "Muhammad Razin Syakib",
-    "phoneNumber": "+6281638279493",
-    "email": "zeen@gmail.com",
-    "password": "akuganteng"
+    "name": {{name}},
+    "phoneNumber": {{phoneNumber}},
+    "email": {{email}},
+    "password": {{password}},
 
 }'
 ```
@@ -33,10 +33,10 @@ Response Success:
     "error": false,
     "message": "Register success, you can login now",
     "data": {
-        "uid": "b2FaDw2dAuJ3zHVxwM2nvp7hed9S",
-        "email": "zeen@gmail.com",
+        "uid": "O0vCqcqXXXXXXXtkHrR4aT2",
+        "email": "zeenXXX@gmail.com",
         "name": "Muhammad Razin Syakib",
-        "phoneNumber": "+6281638279493"
+        "phoneNumber": "+628163XXXXXXX",
     }
 }
 ```
@@ -67,8 +67,8 @@ Request Body:
 curl --location 'http://localhost:5000/api/v1/app/login' \
 --header 'Content-Type: application/json' \
 --data-raw '{
-    "email": "zeen@gmail.com",
-    "password": "akuganteng"
+    "email": {{email}},
+    "password": {{password}}
 }'
 ```
 
@@ -79,9 +79,92 @@ Response Success:
     "error": false,
     "message": "Login success",
     "data": {
-        "uid": "b2Fnvp7hzHVxwM2ed9SaDw2dAuJ3",
+        "uid": "O0vCqcqXXXXXXXtkHrR4aT2",
         "idToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6ImQxNjg5N......PIB4uXejJP929ttJowCJAEExQvs4u88BJUO-BeVPAAv2U-tRxFLMI6RFA",
         "email": "zeen@gmail.com"
     }
 }
 ```
+
+## User
+### [GET] Get User Data
+- URL: `http://localhost:5000/api/v1/app/user/account/:id`
+
+Request Body: 
+```
+curl --location 'http://localhost:5000/api/v1/app/user/account/{{uid}}'
+```
+
+Response Success:
+```
+{
+    "code": 200,
+    "error": false,
+    "message": "Success get user data",
+    "data": {
+        "id": "O0vCqcqXXXXXXXtkHrR4aT2",
+        "name": "Muhammad Razin Syakib",
+        "email": "zeenXXX@gmail.com",
+        "phoneNumber": "+628163XXXXXXX",
+        "photoProfile": "https://firebasestorage.googleapis.com/v0/b/bantucerdasxxx.appspot.com/o/170261XXXXXXX.jpg",
+        "gender": "MALE",
+        "birthDate": "2001-12-02T00:00:00.000Z",
+        "status": "REGISTERED",
+        "createdAt": "2024-01-08T03:55:55.000Z",
+        "updatedAt": "2024-01-08T03:56:21.000Z"
+    }
+}
+```
+
+Response Error if user not found:
+```
+{
+    "code": 404,
+    "error": true,
+    "message": "User not found"
+}
+```
+
+### [PUT] Update User Data for User Profile after Login
+- URL: `http://localhost:5000/api/v1/app/user/account/:id`
+
+Request Body: 
+``` 
+curl --location --request PUT 'http://localhost:5000/api/v1/app/user/account/{{uid}}' \
+--header 'Content-Type: application/json' \
+--data '{
+    "name": {{name}},
+    "phoneNumber": {{phoneNumber}},
+    "photoProfile": {{photoURL}},
+    "gender": {{MALE/FEMALE}},
+    "birthDate": {{birthDate}}
+}'
+```
+
+Response Success:
+```
+{
+    "code": 200,
+    "error": false,
+    "message": "Success update user data"
+}
+```
+
+### [DEL] Delete User Account and The Data
+- URL: `http://localhost:5000/api/v1/app/user/account/:id`
+
+Request Body: 
+```
+curl --location --request DELETE 'http://localhost:5000/api/v1/app/user/account/{{uid}}'
+```
+
+Response Success:
+```
+{
+    "code": 200,
+    "error": false,
+    "message": "Success delete user account and data"
+}
+```
+
+[**@2024 BantuCerdas**]
