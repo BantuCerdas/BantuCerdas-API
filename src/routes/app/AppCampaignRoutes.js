@@ -9,7 +9,7 @@ const {
 } = require("../../controllers/app/AppCampaignController");
 
 router.post("/create", createCampaign);
-router.get("/all-data/:userId", getCampaignByUserId);
+router.get("/all-data/:id_user", getCampaignByUserId);
 router.get("/detail/:campaignId", getCampaignByCampaignId);
 router.put("/update/:id", updateCampaign);
 // router.delete("/champaign/:id", deleteChampaign);

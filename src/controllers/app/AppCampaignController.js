@@ -1,5 +1,7 @@
 require("dotenv").config();
 
+const { authTokenVerifyMiddleware } = require("../../middlewares/middleware");
+
 const Campaign = require("../../models/campaign");
 const Receiver = require("../../models/receiver");
 
@@ -51,7 +53,14 @@ const createCampaign = async (req, res) => {
 
     const campaign = await Campaign.create(createData);
     console.log("Campaign created:", campaign);
-    res.status(201).json({ message: "Your campaign created successfully, we will review it. Please wait" });
+    res
+      .status(201)
+      .json({
+        message:
+          "Your campaign created successfully, we will review it. Please wait",
+      });
+
+    next();
   } catch (error) {
     res.status(400).json({
       code: 400,
@@ -61,13 +70,15 @@ const createCampaign = async (req, res) => {
   }
 };
 
-const getCampaignByUserId = async (req, res) => {
+const getCampaignByUserId = async (req, res, next) => {
+  await authTokenVerifyMiddleware(req, res, next);
+
   try {
-    const { userId } = req.params;
+    const { id_user } = req.params;
 
     const campaign = await Campaign.findAll({
       where: {
-        id_user: userId,
+        id_user: id_user,
       },
     });
 
@@ -94,7 +105,7 @@ const getCampaignByUserId = async (req, res) => {
   }
 };
 
-const getCampaignByCampaignId = async (req, res) => {
+const getCampaignByCampaignId = async (req, res, next) => {
   try {
     const { campaignId } = req.params;
 
@@ -103,6 +114,8 @@ const getCampaignByCampaignId = async (req, res) => {
         id_champaign: campaignId,
       },
     });
+
+    next();
 
     if (!campaign) {
       return res.status(404).json({
