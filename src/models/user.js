@@ -1,13 +1,20 @@
 const { sequelize } = require('../config/db');
 const { DataTypes } = require('sequelize');
+const Campaign = require('./campaign');
 
 const User = sequelize.define(
   "user",
   {
-    id: {
+    id_user: {
       type: DataTypes.STRING,
       primaryKey: true,
       allowNull: false,
+      indexes: [
+        {
+          unique: true,
+          fields: ["id_user"],
+        },
+      ],
     },
     name: {
       type: DataTypes.STRING,
