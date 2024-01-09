@@ -21,10 +21,22 @@ const Campaign = sequelize.define(
     id_user: {
       type: DataTypes.STRING,
       allowNull: false,
+      indexes: [
+        {
+          unique: true,
+          fields: ["id_user"],
+        },
+      ],
     },
     id_receiver: {
       type: DataTypes.STRING,
       allowNull: false,
+      indexes: [
+        {
+          unique: true,
+          fields: ["id_receiver"],
+        },
+      ],
     },
     title: {
       type: DataTypes.STRING,
