@@ -167,4 +167,155 @@ Response Success:
 }
 ```
 
+## Campaign
+### [POST] Create a new Campaign
+- URL: `http://localhost:5000/api/v1/campaign/app/create`
+
+Request Body: 
+```
+curl --location 'http://localhost:5000/api/v1/campaign/app/create' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+  "id_user": "3cVy77uErNWvPlmGf88gg12ASWU2",
+  "title": "Bantu Sekolah SD Negeri XYZ",
+  "description": "Kampanye untuk mengumpulkan donasi seragam sekolah bagi murid-murid SD Negeri XYZ.",
+  "champaign_photo": "https://storage.googleapis.com/campaign.jpg",
+  "target_items": 300,
+  "target_money": 1,
+  "current_items": 40,
+  "current_money": 1,
+  "start_date": "2024-01-01",
+  "end_date": "2024-02-01",
+  "donation_type": "ITEM",
+  "permission_letter": "https://storage.googleapis.com/permission.pdf",
+  "inisiator_name": "Muhammad Sumbul",
+  "inisiator_phone": "08123456789",
+  "inisiator_job": "Guru",
+  "inisiator_workplace": "SD Negeri XYZ",
+  "inisiator_sosmed": "https://twitter.com/sumbul",
+  "receiver_name": "SD Negeri XYZ",
+  "receiver_address": "Jl. Pendidikan No. 123, Kota ABC",
+  "receiver_photo": "https://storage.googleapis.com/school.jpg",
+  "receiver_phone": "087654321",
+  "receiver_email": "info@sdnxyz.com",
+  "receiver_people_count": 300
+}
+```
+
+Response Success:
+```
+{
+    "code": 200,
+    "error": false,
+    "message": "Your campaign created successfully, we will review it. Please wait"
+}
+```
+
+### [GET] Get All Campaign Data by User ID
+- URL: `http://localhost:5000/api/v1/campaign/app/all-data/:userId`
+
+Request Body: 
+```
+curl --location 'http://localhost:5000/api/v1/campaign/app/all-data/mGf88gg123cVy77uErNWvPlASWU2'
+```
+
+Response Success:
+```
+{
+    "code": 200,
+    "error": false,
+    "message": "Success get campaign data",
+    "data": [
+        {
+            "id_champaign": "5a223deb-47dc-4a3c-afb1-10acbaeb6a41",
+            "id_user": "mGf88gg123cVy77uErNWvPlASWU2",
+            "title": "Donasi Seragam Sekolah SD Negeri XYZ",
+            "description": "Kampanye untuk mengumpulkan donasi seragam sekolah bagi murid-murid SD Negeri XYZ.",
+            .....
+            "validation_status": "PENDING",
+            "createdAt": "2024-01-08T20:54:40.000Z",
+            "updatedAt": "2024-01-08T20:54:40.000Z"
+        },
+        {
+            "id_champaign": "5d8f155b-9d8c-4a10-8b23-ba921d483d64",
+            "id_user": "mGf88gg123cVy77uErNWvPlASWU2",
+            "title": "Donasi Seragam Sekolah SD Negeri ABC",
+            "description": "Kampanye untuk mengumpulkan donasi seragam sekolah bagi murid-murid SD Negeri ABC.",
+            .....
+            "validation_status": "PENDING",
+            "createdAt": "2024-01-08T20:29:51.000Z",
+            "updatedAt": "2024-01-08T20:51:29.000Z"
+        },
+        {
+            "id_champaign": "ece6b635-9b29-44d4-a3d5-1ce078be211c",
+            "id_user": "mGf88gg123cVy77uErNWvPlASWU2",
+            "title": "Bantu Sekolah SD Negeri XYZ",
+            "description": "Kampanye untuk mengumpulkan donasi seragam sekolah bagi murid-murid SD Negeri XYZ.",
+            .....
+            "validation_status": "PENDING",
+            "createdAt": "2024-01-08T20:58:42.000Z",
+            "updatedAt": "2024-01-08T20:58:42.000Z"
+        }
+    ]
+}
+```
+
+### [GET] Get Campaign Data by Campaign ID
+- URL: `http://localhost:5000/api/v1/campaign/app/detail/:campaignId`
+
+Request Body: 
+```
+curl --location 'http://localhost:5000/api/v1/campaign/app/detail/ece6b635-9b29-44d4-a3d5-1ce078be211c'
+```
+
+Response Success:
+```
+{
+    "code": 200,
+    "error": false,
+    "message": "Success get campaign data",
+    "data": {
+        "id_champaign": "ece6b635-9b29-44d4-a3d5-1ce078be211c",
+        "id_user": "mGf88gg123cVy77uErNWvPlASWU2",
+        "title": "Donasi Seragam Sekolah SD Negeri ABC",
+        ...
+        "status": "INACTIVE",
+        "validation_status": "PENDING",
+        "createdAt": "2024-01-08T20:58:42.000Z",
+        "updatedAt": "2024-01-08T20:59:32.000Z"
+    }
+}
+```
+
+### [PUT] Update Campaign Data by Campaign ID
+- URL: `http://localhost:5000/api/v1/campaign/app/update/:campaignId`
+
+Request Body: 
+```
+curl --location --request PUT 'http://localhost:5000/api/v1/campaign/app/update/ece6b635-9b29-44d4-a3d5-1ce078be211c' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+  "id_user": "mGf88gg123cVy77uErNWvPlASWU2",
+  "title": "Donasi Seragam Sekolah SD Negeri ABC",
+    ...
+  "target_items": 300,
+  "target_money": 3000000,
+  "current_items": 40,
+  "current_money": 1000000,
+    ...
+  "receiver_email": "info@sdnabc.com",
+  "receiver_people_count": 300
+}
+'
+```
+
+Response Success:
+```
+{
+    "code": 200,
+    "error": false,
+    "message": "Success update campaign data"
+}
+```
+
 [**@2024 BantuCerdas**]
