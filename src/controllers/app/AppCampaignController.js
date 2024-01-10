@@ -109,7 +109,7 @@ const getCampaignDetail = async (req, res, next) => {
 
     const campaign = await Campaign.findOne({
       where: {
-        id_champaign: campaignId,
+        id_campaign: campaignId,
       },
     });
 
@@ -175,14 +175,30 @@ const getCampaignByUserId = async (req, res, next) => {
   }
 };
 
-const updateCampaign = async (req, res) => {
+const updateCampaign = async (req, res, next) => {
   await authTokenVerifyMiddleware(req, res, next);
 
   try {
-    const uid = await getUserId(req.headers["authorization"]);
-    console.log(uid);
+    const token = req.headers.authorization?.split(" ")[1];
+    const uid = await getUserId(token);
+    console.log("Ini UID nya:", uid);
 
-    const { id_campaign } = req.params;
+    const { campaignId } = req.params;
+
+    const campaign = await Campaign.findOne({
+      where: {
+        id_campaign: campaignId,
+        id_user: uid,
+      },
+    });
+
+    if (!campaign) {
+      return res.status(403).json({
+        code: 403,
+        error: true,
+        message: "You don't have the right to edit another user's campaign data",
+      });
+    }
 
     const updateData = {
       title: req.body.title,
@@ -206,7 +222,7 @@ const updateCampaign = async (req, res) => {
 
     await Campaign.update(updateData, {
       where: {
-        id_champaign: id_campaign,
+        id_campaign: campaignId,
         id_user: uid,
       },
     });
