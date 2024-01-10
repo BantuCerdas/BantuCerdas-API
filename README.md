@@ -11,7 +11,7 @@ Follow the instructions below to use the API effectively.
 ## Auth
 
 ### [POST] Sign Up
-- URL: `http://localhost:5000/api/v1/app/register`
+- URL: `http://localhost:5000/api/v1/auth/app/register`
 
 Request Body: 
 ```
@@ -60,7 +60,7 @@ Response Error if phone number already use:
 ```
 
 ### [POST] Sign In and Get Id Token
-- URL: `http://localhost:5000/api/v1/app/login`
+- URL: `http://localhost:5000/api/v1/auth/app/login`
 
 Request Body: 
 ```
@@ -87,12 +87,13 @@ Response Success:
 ```
 
 ## User
-### [GET] Get User Data
-- URL: `http://localhost:5000/api/v1/app/user/account/:id`
+### [GET] Get User Data (by User Id from decoded Id Token)
+- URL: `http://localhost:5000/api/v1/user/app/account`
 
 Request Body: 
 ```
-curl --location 'http://localhost:5000/api/v1/app/user/account/{{uid}}'
+curl --location 'http://localhost:5000/api/v1/user/app/account' \
+--header 'Authorization: Bearer {{idToken}}'
 ```
 
 Response Success:
@@ -125,13 +126,14 @@ Response Error if user not found:
 }
 ```
 
-### [PUT] Update User Data for User Profile after Login
-- URL: `http://localhost:5000/api/v1/app/user/account/:id`
+### [PUT] Update User Data for User Profile after Login (by User Id from decoded Id Token)
+- URL: `http://localhost:5000/api/v1/user/app/account`
 
 Request Body: 
 ``` 
-curl --location --request PUT 'http://localhost:5000/api/v1/app/user/account/{{uid}}' \
+curl --location --request PUT 'http://localhost:5000/api/v1/user/app/account' \
 --header 'Content-Type: application/json' \
+--header 'Authorization: Bearer {{idToken}}' \
 --data '{
     "name": {{name}},
     "phoneNumber": {{phoneNumber}},
@@ -150,12 +152,13 @@ Response Success:
 }
 ```
 
-### [DEL] Delete User Account and The Data
-- URL: `http://localhost:5000/api/v1/app/user/account/:id`
+### [DEL] Delete User Account and The Data (by User Id from decoded Id Token)
+- URL: `http://localhost:5000/api/v1/user/app/account/`
 
 Request Body: 
 ```
-curl --location --request DELETE 'http://localhost:5000/api/v1/app/user/account/{{uid}}'
+curl --location --request DELETE 'http://localhost:5000/api/v1/user/app/account/' \
+--header 'Authorization: Bearer {{idToken}}'
 ```
 
 Response Success:

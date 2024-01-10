@@ -7,8 +7,8 @@ const {
   deleteUserDataAndAccount,
 } = require("../../controllers/app/AppUserController");
 
-router.get("/account/:id", getUserDataById);
-router.put("/account/:id", updateUserData);
-router.delete("/account/:id", deleteUserDataAndAccount);
+router.get("/account", getUserDataById);
+router.put("/account", updateUserData);
+router.delete("/account", deleteUserDataAndAccount);
 
 module.exports = router;
