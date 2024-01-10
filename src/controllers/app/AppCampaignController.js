@@ -5,6 +5,8 @@ const { authTokenVerifyMiddleware } = require("../../middlewares/middleware");
 const Campaign = require("../../models/campaign");
 const Receiver = require("../../models/receiver");
 
+const { getUserId } = require("../../utils/customIdUtil");
+
 const admin = require("firebase-admin");
 const serviceAccount = require("../../config/bantucerdas-firebase.json");
 
@@ -16,7 +18,9 @@ if (!admin.apps.length) {
   admin.app();
 }
 
-const createCampaign = async (req, res) => {
+const createCampaign = async (req, res, next) => {
+  await authTokenVerifyMiddleware(req, res, next);
+
   try {
     const receiverData = {
       receiver_name: req.body.receiver_name,
@@ -30,8 +34,12 @@ const createCampaign = async (req, res) => {
     const receiverSave = await Receiver.create(receiverData);
     console.log("Receiver created:", receiverSave);
 
+    const token = req.headers.authorization?.split(" ")[1];
+    const uid = await getUserId(token);
+    console.log("Ini UID nya:", uid);
+
     const createData = {
-      id_user: req.body.id_user,
+      id_user: uid,
       title: req.body.title,
       description: req.body.description,
       champaign_photo: req.body.champaign_photo,
@@ -53,12 +61,10 @@ const createCampaign = async (req, res) => {
 
     const campaign = await Campaign.create(createData);
     console.log("Campaign created:", campaign);
-    res
-      .status(201)
-      .json({
-        message:
-          "Your campaign created successfully, we will review it. Please wait",
-      });
+    res.status(201).json({
+      message:
+        "Your campaign created successfully, we will review it. Please wait",
+    });
 
     next();
   } catch (error) {
@@ -70,17 +76,9 @@ const createCampaign = async (req, res) => {
   }
 };
 
-const getCampaignByUserId = async (req, res, next) => {
-  await authTokenVerifyMiddleware(req, res, next);
-
+const getAllCampaign = async (req, res) => {
   try {
-    const { id_user } = req.params;
-
-    const campaign = await Campaign.findAll({
-      where: {
-        id_user: id_user,
-      },
-    });
+    const campaign = await Campaign.findAll();
 
     if (!campaign) {
       return res.status(404).json({
@@ -105,7 +103,7 @@ const getCampaignByUserId = async (req, res, next) => {
   }
 };
 
-const getCampaignByCampaignId = async (req, res, next) => {
+const getCampaignDetail = async (req, res, next) => {
   try {
     const { campaignId } = req.params;
 
@@ -140,9 +138,51 @@ const getCampaignByCampaignId = async (req, res, next) => {
   }
 };
 
-const updateCampaign = async (req, res) => {
+const getCampaignByUserId = async (req, res, next) => {
+  await authTokenVerifyMiddleware(req, res, next);
+
   try {
-    const { id } = req.params;
+    const token = req.headers.authorization?.split(" ")[1];
+    const uid = await getUserId(token);
+    console.log("Ini UID nya:", uid);
+
+    const campaign = await Campaign.findAll({
+      where: {
+        id_user: uid,
+      },
+    });
+
+    if (!campaign) {
+      return res.status(404).json({
+        code: 404,
+        error: true,
+        message: "Campaign not found",
+      });
+    }
+
+    res.status(200).json({
+      code: 200,
+      error: false,
+      message: "Success get campaign data",
+      data: campaign,
+    });
+  } catch (error) {
+    res.status(400).json({
+      code: 400,
+      error: true,
+      message: error.message,
+    });
+  }
+};
+
+const updateCampaign = async (req, res) => {
+  await authTokenVerifyMiddleware(req, res, next);
+
+  try {
+    const uid = await getUserId(req.headers["authorization"]);
+    console.log(uid);
+
+    const { id_campaign } = req.params;
 
     const updateData = {
       title: req.body.title,
@@ -166,7 +206,8 @@ const updateCampaign = async (req, res) => {
 
     await Campaign.update(updateData, {
       where: {
-        id_champaign: id,
+        id_champaign: id_campaign,
+        id_user: uid,
       },
     });
 
@@ -186,7 +227,8 @@ const updateCampaign = async (req, res) => {
 
 module.exports = {
   createCampaign,
+  getAllCampaign,
+  getCampaignDetail,
   getCampaignByUserId,
-  getCampaignByCampaignId,
   updateCampaign,
 };
