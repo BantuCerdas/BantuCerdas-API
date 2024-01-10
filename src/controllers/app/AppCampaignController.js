@@ -70,17 +70,44 @@ const createCampaign = async (req, res) => {
   }
 };
 
-const getCampaignByUserId = async (req, res, next) => {
-  await authTokenVerifyMiddleware(req, res, next);
-
+const getAllCampaign = async (req, res) => {
   try {
-    const { id_user } = req.params;
+    const campaign = await Campaign.findAll();
 
-    const campaign = await Campaign.findAll({
+    if (!campaign) {
+      return res.status(404).json({
+        code: 404,
+        error: true,
+        message: "Campaign not found",
+      });
+    }
+
+    res.status(200).json({
+      code: 200,
+      error: false,
+      message: "Success get campaign data",
+      data: campaign,
+    });
+  } catch (error) {
+    res.status(400).json({
+      code: 400,
+      error: true,
+      message: error.message,
+    });
+  }
+}
+
+const getCampaignDetail = async (req, res, next) => {
+  try {
+    const { campaignId } = req.params;
+
+    const campaign = await Campaign.findOne({
       where: {
-        id_user: id_user,
+        id_champaign: campaignId,
       },
     });
+
+    next();
 
     if (!campaign) {
       return res.status(404).json({
@@ -105,17 +132,17 @@ const getCampaignByUserId = async (req, res, next) => {
   }
 };
 
-const getCampaignByCampaignId = async (req, res, next) => {
-  try {
-    const { campaignId } = req.params;
+const getCampaignByUserId = async (req, res, next) => {
+  await authTokenVerifyMiddleware(req, res, next);
 
-    const campaign = await Campaign.findOne({
+  try {
+    const { id_user } = req.params;
+
+    const campaign = await Campaign.findAll({
       where: {
-        id_champaign: campaignId,
+        id_user: id_user,
       },
     });
-
-    next();
 
     if (!campaign) {
       return res.status(404).json({
@@ -186,7 +213,8 @@ const updateCampaign = async (req, res) => {
 
 module.exports = {
   createCampaign,
+  getAllCampaign,
+  getCampaignDetail,
   getCampaignByUserId,
-  getCampaignByCampaignId,
   updateCampaign,
 };
