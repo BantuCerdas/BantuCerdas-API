@@ -85,9 +85,16 @@ const register = async (req, res) => {
     console.log("userResponse", userResponse);
 
     const uid = userResponse.uid;
-    const email = userResponse.email;
     const name = userResponse.displayName;
+    const email = userResponse.email;
     const phoneNumber = userResponse.phoneNumber;
+
+    await User.create({
+      id_user: uid,
+      name: name,
+      email: email,
+      phoneNumber: phoneNumber,
+    });
 
     res.status(200).json({
       code: 200,
@@ -101,13 +108,6 @@ const register = async (req, res) => {
       },
     });
 
-    await User.create({
-      id: uid,
-      name: name,
-      email: email,
-      phoneNumber: phoneNumber,
-    });
-    
     console.log("User created");
   } catch (error) {
     res.status(400).json({

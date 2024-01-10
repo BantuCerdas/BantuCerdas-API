@@ -5,6 +5,8 @@ const { authTokenVerifyMiddleware } = require("../../middlewares/middleware");
 const Campaign = require("../../models/campaign");
 const Receiver = require("../../models/receiver");
 
+const { getUserId } = require("../../utils/customIdUtil");
+
 const admin = require("firebase-admin");
 const serviceAccount = require("../../config/bantucerdas-firebase.json");
 
@@ -16,7 +18,9 @@ if (!admin.apps.length) {
   admin.app();
 }
 
-const createCampaign = async (req, res) => {
+const createCampaign = async (req, res, next) => {
+  await authTokenVerifyMiddleware(req, res, next);
+
   try {
     const receiverData = {
       receiver_name: req.body.receiver_name,
@@ -30,8 +34,12 @@ const createCampaign = async (req, res) => {
     const receiverSave = await Receiver.create(receiverData);
     console.log("Receiver created:", receiverSave);
 
+    const token = req.headers.authorization?.split(" ")[1];
+    const uid = await getUserId(token);
+    console.log("Ini UID nya:", uid);
+
     const createData = {
-      id_user: req.body.id_user,
+      id_user: uid,
       title: req.body.title,
       description: req.body.description,
       champaign_photo: req.body.champaign_photo,
@@ -53,12 +61,10 @@ const createCampaign = async (req, res) => {
 
     const campaign = await Campaign.create(createData);
     console.log("Campaign created:", campaign);
-    res
-      .status(201)
-      .json({
-        message:
-          "Your campaign created successfully, we will review it. Please wait",
-      });
+    res.status(201).json({
+      message:
+        "Your campaign created successfully, we will review it. Please wait",
+    });
 
     next();
   } catch (error) {
@@ -95,7 +101,7 @@ const getAllCampaign = async (req, res) => {
       message: error.message,
     });
   }
-}
+};
 
 const getCampaignDetail = async (req, res, next) => {
   try {
@@ -136,11 +142,13 @@ const getCampaignByUserId = async (req, res, next) => {
   await authTokenVerifyMiddleware(req, res, next);
 
   try {
-    const { id_user } = req.params;
+    const token = req.headers.authorization?.split(" ")[1];
+    const uid = await getUserId(token);
+    console.log("Ini UID nya:", uid);
 
     const campaign = await Campaign.findAll({
       where: {
-        id_user: id_user,
+        id_user: uid,
       },
     });
 
@@ -168,8 +176,13 @@ const getCampaignByUserId = async (req, res, next) => {
 };
 
 const updateCampaign = async (req, res) => {
+  await authTokenVerifyMiddleware(req, res, next);
+
   try {
-    const { id } = req.params;
+    const uid = await getUserId(req.headers["authorization"]);
+    console.log(uid);
+
+    const { id_campaign } = req.params;
 
     const updateData = {
       title: req.body.title,
@@ -193,7 +206,8 @@ const updateCampaign = async (req, res) => {
 
     await Campaign.update(updateData, {
       where: {
-        id_champaign: id,
+        id_champaign: id_campaign,
+        id_user: uid,
       },
     });
 

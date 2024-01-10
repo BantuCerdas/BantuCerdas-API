@@ -12,7 +12,7 @@ const {
 router.post("/create", createCampaign);
 router.get("/all-data", getAllCampaign);
 router.get("/detail/:campaignId", getCampaignDetail);
-router.get("/all-data/:id_user", getCampaignByUserId);
+router.get("/by-userId", getCampaignByUserId);
 router.put("/update/:id", updateCampaign);
 // router.delete("/champaign/:id", deleteChampaign);
 
