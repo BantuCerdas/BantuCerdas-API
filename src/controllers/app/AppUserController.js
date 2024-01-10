@@ -1,6 +1,8 @@
 require("dotenv").config();
 
 const User = require("../../models/user");
+const { authTokenVerifyMiddleware } = require("../../middlewares/middleware");
+const { getUserId } = require("../../utils/customIdUtil");
 
 const admin = require("firebase-admin");
 const serviceAccount = require("../../config/bantucerdas-firebase.json");
@@ -13,34 +15,52 @@ if (!admin.apps.length) {
   admin.app();
 }
 
-const getUserDataById = async (req, res) => {
-  const { id } = req.params;
+const getUserDataById = async (req, res, next) => {
+  await authTokenVerifyMiddleware(req, res, next);
 
-  const user = await User.findOne({
-    where: {
-      id: id,
-    },
-  });
+  try{ 
+    const token = req.headers.authorization?.split(" ")[1];
+    const uid = await getUserId(token);
+    console.log("Ini UID nya:", uid);
+  
+    const user = await User.findOne({
+      where: {
+        id_user: uid,
+      },
+    });
+  
+    if (!user) {
+      return res.status(404).json({
+        code: 404,
+        error: true,
+        message: "User not found",
+      });
+    }
+  
+    res.status(200).json({
+      code: 200,
+      error: false,
+      message: "Success get user data",
+      data: user,
+    });
 
-  if (!user) {
-    return res.status(404).json({
-      code: 404,
+    next();
+  } catch (error) {
+    res.status(400).json({
+      code: 400,
       error: true,
-      message: "User not found",
+      message: error.message,
     });
   }
-
-  res.status(200).json({
-    code: 200,
-    error: false,
-    message: "Success get user data",
-    data: user,
-  });
 };
 
-const updateUserData = async (req, res) => {
+const updateUserData = async (req, res, next) => {
+  await authTokenVerifyMiddleware(req, res, next);
+
   try {
-    const { id } = req.params;
+    const token = req.headers.authorization?.split(" ")[1];
+    const uid = await getUserId(token);
+    console.log("Ini UID nya:", uid);
 
     const updateData = {
       name: req.body.name,
@@ -52,11 +72,11 @@ const updateUserData = async (req, res) => {
 
     await User.update(updateData, {
       where: {
-        id: id,
+        id_user: uid,
       },
     });
 
-    await admin.auth().updateUser(id, {
+    await admin.auth().updateUser(uid, {
       displayName: req.body.name,
       photoURL: req.body.photoProfile,
     });
@@ -66,6 +86,8 @@ const updateUserData = async (req, res) => {
       error: false,
       message: "Success update user data",
     });
+
+    next();
   } catch (error) {
     res.status(400).json({
       code: 400,
@@ -75,23 +97,29 @@ const updateUserData = async (req, res) => {
   }
 };
 
-const deleteUserDataAndAccount = async (req, res) => {
+const deleteUserDataAndAccount = async (req, res, next) => {
+  await authTokenVerifyMiddleware(req, res, next);
+
   try {
-    const { id } = req.params;
+    const token = req.headers.authorization?.split(" ")[1];
+    const uid = await getUserId(token);
+    console.log("Ini UID nya:", uid);
 
     await User.destroy({
       where: {
-        id: id,
+        id_user: uid,
       },
     });
 
-    await admin.auth().deleteUser(id);
+    await admin.auth().deleteUser(uid);
 
     res.status(200).json({
       code: 200,
       error: false,
       message: "Success delete user account and data",
     });
+
+    next();
   } catch (error) {
     res.status(400).json({
       code: 400,
