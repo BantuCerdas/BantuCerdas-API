@@ -57,6 +57,10 @@ const Donation = sequelize.define(
     delivery_receipt: {
       type: DataTypes.STRING,
     },
+    delivery_provider: {
+      type: DataTypes.ENUM,
+      values: ["JNE", "POS", "JNT", "JNT_CARGO", "SICEPAT", "ANTERAJA", "NINJA", "WAHANA"],
+    },
   },
   {
     tableName: "donation",
