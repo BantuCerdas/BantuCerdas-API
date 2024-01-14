@@ -1,6 +1,5 @@
 const { sequelize } = require("../config/db");
 const { DataTypes } = require("sequelize");
-const Campaign = require("./campaign");
 
 const Receiver = sequelize.define(
   "receiver",
@@ -45,6 +44,13 @@ const Receiver = sequelize.define(
     timestamps: true,
     createdAt: "createdAt",
     updatedAt: "updatedAt",
+  },
+  {
+    classMethods: {
+      associate: function (models) {
+        Receiver.hasMany(models.Campaign);
+      },
+    },
   }
 );
 

@@ -1,6 +1,9 @@
 const { sequelize } = require("../config/db");
 const { DataTypes } = require("sequelize");
 
+const Campaign = require("./campaign");
+const User = require("./user");
+
 const Donation = sequelize.define(
   "donation",
   {
@@ -17,7 +20,7 @@ const Donation = sequelize.define(
       ],
     },
     id_campaign: {
-      type: DataTypes.STRING,
+      type: DataTypes.UUID,
       allowNull: false,
       indexes: [
         {
@@ -67,8 +70,25 @@ const Donation = sequelize.define(
     timestamps: true,
     createdAt: "createdAt",
     updatedAt: "updatedAt",
+  },
+  {
+    classMethods: {
+      associate: function (models) {
+        Donation.hasMany(models.Campaign);
+      },
+    },
   }
 );
+
+Donation.belongsTo(Campaign, {
+  foreignKey: "id_campaign",
+  targetKey: "id_campaign",
+});
+
+Donation.belongsTo(User, {
+  foreignKey: "id_user",
+  targetKey: "id_user",
+});
 
 sequelize.sync();
 

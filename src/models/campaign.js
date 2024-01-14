@@ -1,7 +1,8 @@
 const { sequelize } = require("../config/db");
 const { DataTypes } = require("sequelize");
-const User = require("./user"); // Import the User model
-const Receiver = require("./receiver"); // Import the Receiver model
+
+const User = require("./user");
+const Receiver = require("./receiver");
 
 const Campaign = sequelize.define(
   "campaign",
@@ -29,7 +30,7 @@ const Campaign = sequelize.define(
       ],
     },
     id_receiver: {
-      type: DataTypes.STRING,
+      type: DataTypes.UUID,
       allowNull: false,
       indexes: [
         {
@@ -132,10 +133,14 @@ const Campaign = sequelize.define(
   }
 );
 
-// Define the association between Campaign and Receiver models
 Campaign.belongsTo(Receiver, {
   foreignKey: "id_receiver",
   targetKey: "id_receiver",
+});
+
+Campaign.belongsTo(User, {
+  foreignKey: "id_user",
+  targetKey: "id_user",
 });
 // Campaign.belongsTo(User, { foreignKey: "id_user" });
 // Campaign.belongsTo(Receiver, { foreignKey: "id_receiver"});
