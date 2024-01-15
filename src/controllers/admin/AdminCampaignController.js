@@ -51,7 +51,11 @@ const getAdminAllCampaigns = async (req, res, next) => {
         data: campaigns,
       });
     } else {
-      throw new Error("Unauthorized access");
+      res.status(403).json({
+        code: 403,
+        error: true,
+        message: "Unauthorized Access, only admin can access this",
+      });
     }
   } catch (error) {
     next(error);
