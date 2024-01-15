@@ -10,6 +10,8 @@ const { getUserId } = require("../../utils/customIdUtil");
 const admin = require("firebase-admin");
 const serviceAccount = require("../../config/bantucerdas-firebase.json");
 
+const axios = require("axios");
+
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
@@ -42,6 +44,7 @@ const createItemDonation = async (req, res, next) => {
       item_name: req.body.item_name,
       item_qty: req.body.item_qty,
       delivery_receipt: req.body.delivery_receipt,
+      delivery_provider: req.body.delivery_provider,
     };
 
     const donationSave = await Donation.create(createData);
@@ -177,11 +180,22 @@ const getDonationDetailByUserId = async (req, res, next) => {
       });
     }
 
+    const deliveryReceipt = donation.delivery_receipt;
+    const deliveryProvider = donation.delivery_provider;
+
+    const trackingUrl = `https://api.binderbyte.com/v1/track?api_key=4c96e88339b76f7553de7ed768ef75e1fd8ecb5f6af431b7f3ba04d765d1f4d2&courier=${deliveryProvider}&awb=${deliveryReceipt}`;
+
+    const response = await axios.get(trackingUrl);
+    const trackingStatus = response.data.data;
+
     res.status(200).json({
       code: 200,
       error: false,
       message: "Success get donation data",
-      data: donation,
+      data: {
+        donation,
+        trackingStatus,
+      },
     });
   } catch (error) {
     res.status(400).json({

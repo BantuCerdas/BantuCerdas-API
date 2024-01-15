@@ -1,6 +1,5 @@
 const { sequelize } = require('../config/db');
 const { DataTypes } = require('sequelize');
-const Campaign = require('./campaign');
 
 const User = sequelize.define(
   "user",
@@ -38,6 +37,11 @@ const User = sequelize.define(
     birthDate: {
       type: DataTypes.DATE,
     },
+    role: {
+      type: DataTypes.ENUM,
+      values: ["USER", "ADMIN"],
+      defaultValue: "USER",
+    },
     status: {
       type: DataTypes.ENUM,
       values: ["REGISTERED", "UNREGISTERED"],
@@ -49,6 +53,13 @@ const User = sequelize.define(
     timestamps: true,
     createdAt: "createdAt",
     updatedAt: "updatedAt",
+  },
+  {
+    classMethods: {
+      associate: function (models) {
+        User.hasMany(models.Campaign);
+      },
+    },
   }
 );
 
