@@ -9,11 +9,15 @@ env:
   APP_ID: bantucerdas-api
   RUN_REGION: asia-southeast2
   SA_KEY_JSON: ${{ secrets.GCP_SA_KEY_JSON }}
+  DOCKER_PKG_REGION: ${{ secrets.GCP_DOCKER_PKG_REGION }}
+  DOCKER_REPO: ${{ secrets.GCP_DOCKER_REPO }}
+  DOCKER_IMAGE: ${{ secrets.GCP_DOCKER_IMAGE }}
+
 jobs:
   deploy:
     name: Deploy to Cloud Run
     runs-on: ubuntu-latest
-    if: "contains(github.event.head_commit.message, 'to deploy')"
+    # if: "contains(github.event.head_commit.message, 'to deploy')"
     steps:
       - uses: actions/checkout@v2
 
