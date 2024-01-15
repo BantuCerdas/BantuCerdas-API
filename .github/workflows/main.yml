@@ -39,7 +39,7 @@ jobs:
 
       # Build and push image to Google Container Registry
       - name: Build
-        run: gcloud builds submit --tag asia-southeast2-docker.pkg.dev/bantucerdas-aa6ec/bantucerdas-repo/bantucerdas-api-image:latest:$GITHUB_SHA
+        run: gcloud builds submit --tag asia-southeast2-docker.pkg.dev/bantucerdas-aa6ec/bantucerdas-repo/bantucerdas-api-image:$GITHUB_SHA
 
       - name: Deploy
-        run: gcloud run deploy $APP_ID --image asia-southeast2-docker.pkg.dev/bantucerdas-aa6ec/bantucerdas-repo/bantucerdas-api-image:latest:$GITHUB_SHA --platform managed --region $RUN_REGION --allow-unauthenticated
+        run: gcloud run deploy $APP_ID --image asia-southeast2-docker.pkg.dev/bantucerdas-aa6ec/bantucerdas-repo/bantucerdas-api-image:$GITHUB_SHA --platform managed --region $RUN_REGION --allow-unauthenticated
