@@ -31,7 +31,7 @@ jobs:
       - uses: 'google-github-actions/auth@v2'
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
-          service_account: ${{ secrets.GCP_SA_KEY_JSON }}
+          credentials_json: ${{ secrets.GCP_SA_KEY_JSON }}
 
       # Set gcloud project id configuration
       - name: Set gcloud configuration
